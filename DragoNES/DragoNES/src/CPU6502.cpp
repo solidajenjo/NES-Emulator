@@ -1,7 +1,8 @@
 #include "CPU6502.h"
 #include <iostream>
-
-//TODO:Rember the 16 NES roms header
+#include <fstream>
+#include <assert.h>
+#include <sstream>
 
 CPU6502::CPU6502()
 {
@@ -16,6 +17,7 @@ bool CPU6502::Start()
 {
 	std::cout << "Starting CPU6502 module." << std::endl;
 	CreateInstructionArray();
+	LoadRom("Castlevania (USA) (Rev A).nes");
 	return true;
 }
 
@@ -280,4 +282,87 @@ void CPU6502::CreateInstructionArray() {
 	instructions[0x8A] = Instruction(0x8A, 1, 2, "TXA	        ");
 	instructions[0x9A] = Instruction(0x9A, 1, 2, "TXS	        ");
 	instructions[0x98] = Instruction(0x98, 1, 2, "TYA	        ");
+}
+
+bool CPU6502::LoadRom(const std::string& name)
+{
+	std::cout << "Loading ROM " << name << "." << std::endl;
+	unsigned char opcode;	
+	std::ifstream source(name.c_str(), std::ios_base::binary);
+	std::stringstream ss;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	//Header
+	for (int i = 0; i < 3 && source; ++i) { //Header
+		source >> opcode;
+		ss << opcode;
+	}
+	if (ss.str() != "NES") {
+		std::cout << "Bad header. Aborting." << std::endl;
+	}
+	assert(source);
+	source >> opcode; //EOL flush
+
+	source >> opcode;
+	PRG_ROM_size = opcode * 16;
+
+	source >> opcode;
+	CHR_ROM_size = opcode * 8;
+
+	std::cout << "PRG_ROM size " + std::to_string(PRG_ROM_size) + "Kb." << std::endl;
+	std::cout << "CHR_ROM size " + std::to_string(CHR_ROM_size) + "Kb." << std::endl;
+
+	//Flags
+	source >> F6;
+	char trainer = F6;
+	trainer = trainer >> 2;
+	hasTrainer = trainer & 1;
+
+	source >> F7;
+	source >> F8;
+	source >> F9;
+	source >> F10;
+
+	ss.clear();
+
+	//Extra info
+	for (int i = 0; i < 5 && source; ++i) { 
+		source >> opcode;
+		ss << opcode;
+	}
+	std::cout << "Ripper info: " + ss.str() << std::endl;
+
+	ss.clear();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	while (source) {				
+		source >> opcode;
+		Instruction newInstruction = Instruction(instructions[opcode]);
+		if (newInstruction.length == 3) {
+			char data;
+			assert(source);
+			source >> data;
+			newInstruction.ab = data;
+			assert(source);
+			source >> data;
+			newInstruction.cd = data;			
+			newInstruction.text.replace(newInstruction.text.find("@"), 1, std::to_string(newInstruction.ab));
+			newInstruction.text.replace(newInstruction.text.find("¡"), 1, std::to_string(newInstruction.cd));
+			std::cout << newInstruction.text << std::endl;
+		}
+		else if (newInstruction.length == 2) {
+			char data;
+			assert(source);
+			source >> data;
+			newInstruction.ab = data;
+			newInstruction.text.replace(newInstruction.text.find("@"), 1, std::to_string(newInstruction.ab));
+			std::cout << newInstruction.text << std::endl;
+		}
+		else {
+			std::cout << newInstruction.text << std::endl;
+		}
+
+	}
+	return false;
 }

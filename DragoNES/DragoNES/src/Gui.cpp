@@ -20,18 +20,23 @@ bool Gui::PreUpdate()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(App->render->window);
 	ImGui::NewFrame();
+
 	return true;
 }
 
 bool Gui::Update()
 {
 	bool d;
-	ImGui::Begin("Another Window", &d);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-	ImGui::Text("Hello from another window!");
-	if (ImGui::Button("Close Me"))
-		d = false;
+	if (ImGui::Begin("Assembler", &d))
+	{
+		ImGui::Text("Hello from another window!");		
+	}
 	ImGui::End();
-
+	if (ImGui::Begin("Memory", &d))
+	{
+		ImGui::Text("Hello from another window!");
+	}
+	ImGui::End();
 	ImGui::Render();
 	return true;
 }
