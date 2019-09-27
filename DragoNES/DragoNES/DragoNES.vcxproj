@@ -156,6 +156,10 @@
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\Render.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="docs\65xx Opcode List.txt" />
+    <Text Include="docs\65xx Processor Data.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

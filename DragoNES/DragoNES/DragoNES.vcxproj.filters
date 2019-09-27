@@ -16,6 +16,9 @@
     <Filter Include="Resource Files\ImGUI">
       <UniqueIdentifier>{deca24a1-60fd-4d62-a724-ea22f7d3e7fe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\docs">
+      <UniqueIdentifier>{33de1adf-fd51-41c7-8b78-3fa90df21a59}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\imgui-1.73\imconfig.h">
@@ -95,5 +98,13 @@
     <ClCompile Include="src\Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="docs\65xx Opcode List.txt">
+      <Filter>Resource Files\docs</Filter>
+    </Text>
+    <Text Include="docs\65xx Processor Data.txt">
+      <Filter>Resource Files\docs</Filter>
+    </Text>
   </ItemGroup>
 </Project>
