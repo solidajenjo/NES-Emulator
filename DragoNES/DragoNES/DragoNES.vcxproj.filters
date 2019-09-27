@@ -48,6 +48,15 @@
     <ClInclude Include="src\Gui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Render.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Globals.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\imgui-1.73\imgui.cpp">
@@ -71,10 +80,19 @@
     <ClCompile Include="src\CPU6502.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Module.cpp">
+    <ClCompile Include="src\Gui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Gui.cpp">
+    <ClCompile Include="src\Render.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui-1.73\imgui_impl_opengl3.cpp">
+      <Filter>Resource Files\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui-1.73\imgui_impl_sdl.cpp">
+      <Filter>Resource Files\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

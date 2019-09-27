@@ -1,15 +1,18 @@
 #include <iostream>
 #include "Application.h"
+#include "Globals.h"
 using namespace std;
 
 
 int main() {
 
-	Application App;
+	App = new Application();
 	
 	cout << "DragoNES emulator init." << endl;
 
-	while (App.Update());
+	while (App->Update());
 	
+	RELEASE(App);
+
 	cout << "DragoNES emulator quit." << endl;
 }

@@ -1,14 +1,25 @@
+#include "Render.h"
 #include "Application.h"
 #include "Module.h"
+#include "Input.h"
 #include "CPU6502.h"
 #include "Gui.h"
 #include <iostream>
 
+Application* App;
 
 Application::Application()
 {
-	modules.push_back(new CPU6502());
-	modules.push_back(new Gui());
+	App = this;
+	gui.reset(new Gui());
+	cpu.reset(new CPU6502());
+	render.reset(new Render());
+	input.reset(new Input());
+
+	modules.push_back(cpu.get());
+	modules.push_back(render.get());
+	modules.push_back(gui.get());
+	modules.push_back(input.get());
 }
 
 
@@ -18,13 +29,13 @@ Application::~Application()
 
 bool Application::Update()
 {
-	bool status = false;
+	bool status = true;
 
 	switch (applicationState) {
 	case ApplicationState::START:
-		for (std::list<Module*>::iterator it = modules.begin(); it != modules.end(); ++it)
+		for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && status; ++it)
 		{
-			status = status || (*it)->Start();
+			status = (*it)->Start();
 		}
 		if (status) {
 			std::cout << "DragoNES start OK." << std::endl;
@@ -36,10 +47,21 @@ bool Application::Update()
 		}
 		break;
 	case ApplicationState::RUN:
-		for (std::list<Module*>::iterator it = modules.begin(); it != modules.end(); ++it)
+		for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && status; ++it)
 		{
-			status = status || (*it)->Update();
+			status = (*it)->PreUpdate();
 		}
+
+		for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && status; ++it)
+		{
+			status = (*it)->Update();
+		}
+
+		for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && status; ++it)
+		{
+			status = (*it)->PostUpdate();
+		}
+
 		if (!status){
 			std::cout << "DragoNES update Failed." << std::endl;
 			applicationState = ApplicationState::CLOSE;

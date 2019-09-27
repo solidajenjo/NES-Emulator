@@ -4,12 +4,16 @@
 class Module
 {
 public:
-	Module();
-	virtual ~Module() = 0;
+
+	virtual ~Module() {};
 
 	virtual bool Start() { return true; }
+	virtual bool PreUpdate() { return true; }
 	virtual bool Update() { return true; }
+	virtual bool PostUpdate() { return true; }
 	virtual bool Close() { return true; }
+
+	
 };
 
 #endif
