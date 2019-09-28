@@ -1,9 +1,12 @@
 #include "Gui.h"
 #include "Render.h"
 #include "Application.h"
+#include "CPU6502.h"
 #include "imgui-1.73/imgui_impl_sdl.h"
 #include "imgui-1.73/imgui_impl_opengl3.h"
 #include <iostream>
+#include <sstream>
+
 
 Gui::Gui()
 {
@@ -32,9 +35,21 @@ bool Gui::Update()
 		ImGui::Text("Hello from another window!");		
 	}
 	ImGui::End();
-	if (ImGui::Begin("Memory", &d))
+	if (ImGui::Begin("PRG ROM", &d))
 	{
-		ImGui::Text("Hello from another window!");
+		unsigned i = 0u;
+		std::stringstream ss;
+		for (const unsigned char c : App->cpu->PRG_ROM) {			
+			if (c < 0x10)
+				ss << '0';
+			ss << std::hex << (unsigned int)c << "  ";
+			++i;
+			if (i == 16u) {
+				ImGui::Text(ss.str().c_str());
+				ss.str("");
+				i = 0u;
+			}			
+		}
 	}
 	ImGui::End();
 	ImGui::Render();

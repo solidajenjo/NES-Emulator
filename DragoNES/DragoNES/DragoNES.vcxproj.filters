@@ -106,5 +106,8 @@
     <Text Include="docs\65xx Processor Data.txt">
       <Filter>Resource Files\docs</Filter>
     </Text>
+    <Text Include="docs\nesmemorymapping.txt">
+      <Filter>Resource Files\docs</Filter>
+    </Text>
   </ItemGroup>
 </Project>

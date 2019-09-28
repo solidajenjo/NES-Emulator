@@ -159,6 +159,7 @@
   <ItemGroup>
     <Text Include="docs\65xx Opcode List.txt" />
     <Text Include="docs\65xx Processor Data.txt" />
+    <Text Include="docs\nesmemorymapping.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

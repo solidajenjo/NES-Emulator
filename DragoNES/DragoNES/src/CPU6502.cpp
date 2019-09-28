@@ -17,7 +17,7 @@ bool CPU6502::Start()
 {
 	std::cout << "Starting CPU6502 module." << std::endl;
 	CreateInstructionArray();
-	LoadRom("Castlevania (USA) (Rev A).nes");
+	LoadRom("Super Mario Bros. (World).nes");
 	return true;
 }
 
@@ -293,76 +293,67 @@ bool CPU6502::LoadRom(const std::string& name)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	//Header
-	for (int i = 0; i < 3 && source; ++i) { //Header
-		source >> opcode;
-		ss << opcode;
-	}
+	char header[16];
+	source.read(header, sizeof(char) * 16);
+	ss << header[0] << header[1] << header[2];	
 	if (ss.str() != "NES") {
 		std::cout << "Bad header. Aborting." << std::endl;
 	}
 	assert(source);
-	source >> opcode; //EOL flush
-
-	source >> opcode;
-	PRG_ROM_size = opcode * 16;
-
-	source >> opcode;
-	CHR_ROM_size = opcode * 8;
+	
+	PRG_ROM_size = header[4] * 16;
+	CHR_ROM_size = header[5] * 8;
 
 	std::cout << "PRG_ROM size " + std::to_string(PRG_ROM_size) + "Kb." << std::endl;
 	std::cout << "CHR_ROM size " + std::to_string(CHR_ROM_size) + "Kb." << std::endl;
 
-	//Flags
-	source >> F6;
-	char trainer = F6;
-	trainer = trainer >> 2;
-	hasTrainer = trainer & 1;
+	//Flags		
+	F6 = { header[6] };
+	
+	std::cout << std::endl << "Flag6" << std::endl;
+	std::cout << "-----" << std::endl;
+	std::cout << "Mapper: " << std::to_string(F6.mapper) << std::endl;
+	std::cout << "Ignore mirroring: " << std::to_string(F6.ignoreMirroring) << std::endl;
+	std::cout << "Trainer: " << std::to_string(F6.trainer) << std::endl;
+	std::cout << "Battery-packed PRG RAM: " << std::to_string(F6.batteryPGR_RAM) << std::endl;
+	std::cout << "Mirroring: " << std::to_string(F6.mirroring) << std::endl;
+	
+	F7 = { header[7] };
+	
+	std::cout << std::endl << "Flag7" << std::endl;
+	std::cout << "-----" << std::endl;
+	std::cout << "Mapper: " << std::to_string(F7.mapper) << std::endl;
+	if (F7.nes2_0 == 2)
+		std::cout << "Format: NES 2.0" << std::endl;
+	else
+		std::cout << "Format: iNES" << std::endl;
 
-	source >> F7;
-	source >> F8;
-	source >> F9;
-	source >> F10;
+	std::cout << "PlayChoice-10: " << std::to_string(F7.playChoice_10) << std::endl;	
+	std::cout << "VS Unisystem: " << std::to_string(F7.VS_Unisystem) << std::endl;
 
-	ss.clear();
+	F8 = { header[8] };
 
-	//Extra info
-	for (int i = 0; i < 5 && source; ++i) { 
-		source >> opcode;
-		ss << opcode;
-	}
-	std::cout << "Ripper info: " + ss.str() << std::endl;
+	std::cout << std::endl << "Flag8" << std::endl;
+	std::cout << "-----" << std::endl;
+	std::cout << "PRG RAM size: " << std::to_string(F8.PRG_RAM_size) << std::endl;
+	
+	F9 = { header[9] };
 
-	ss.clear();
+	F10 = { header[10] };
 
+	std::cout << std::endl << "Flag9" << std::endl;
+	std::cout << "-----" << std::endl;
+	if (F10.TV_system == 0)
+		std::cout << "TV system: NTSC"<< std::endl;
+	else if (F10.TV_system == 2)
+		std::cout << "TV system: PAL"<< std::endl;
+	else
+		std::cout << "TV system: Dual compatible"<< std::endl;
+			
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	PRG_ROM.resize(PRG_ROM_size * 1024);
 
-	while (source) {				
-		source >> opcode;
-		Instruction newInstruction = Instruction(instructions[opcode]);
-		if (newInstruction.length == 3) {
-			char data;
-			assert(source);
-			source >> data;
-			newInstruction.ab = data;
-			assert(source);
-			source >> data;
-			newInstruction.cd = data;			
-			newInstruction.text.replace(newInstruction.text.find("@"), 1, std::to_string(newInstruction.ab));
-			newInstruction.text.replace(newInstruction.text.find("¡"), 1, std::to_string(newInstruction.cd));
-			std::cout << newInstruction.text << std::endl;
-		}
-		else if (newInstruction.length == 2) {
-			char data;
-			assert(source);
-			source >> data;
-			newInstruction.ab = data;
-			newInstruction.text.replace(newInstruction.text.find("@"), 1, std::to_string(newInstruction.ab));
-			std::cout << newInstruction.text << std::endl;
-		}
-		else {
-			std::cout << newInstruction.text << std::endl;
-		}
-
-	}
+	source.read(reinterpret_cast<char*>(&PRG_ROM[0]), sizeof(char) * PRG_ROM_size * 1024);
 	return false;
 }
