@@ -39,7 +39,7 @@ bool Gui::Update()
 	{
 		unsigned i = 0u;
 		std::stringstream ss;
-		for (const unsigned char c : App->cpu->PRG_ROM) {			
+		for (const unsigned char c : App->cpu->PRG_ROM) {	//TODO: This is so slow		
 			if (c < 0x10)
 				ss << '0';
 			ss << std::hex << (unsigned int)c << "  ";

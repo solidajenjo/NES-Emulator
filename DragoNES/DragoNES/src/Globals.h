@@ -21,4 +21,11 @@
 		 }\
 	 }
 
+inline unsigned char GET_BIT(unsigned char b, unsigned char v){
+	return 0x01 << b & v;
+}
+
+inline unsigned char GET_2BIT(unsigned char b, unsigned char v) {
+	return 0x03 << b & v;
+}
 #endif

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <assert.h>
 #include <sstream>
+#include "Globals.h"
 
 CPU6502::CPU6502()
 {
@@ -16,8 +17,11 @@ CPU6502::~CPU6502()
 bool CPU6502::Start()
 {
 	std::cout << "Starting CPU6502 module." << std::endl;
-	CreateInstructionArray();
-	LoadRom("Super Mario Bros. (World).nes");
+	CreateInstructionArray();	
+	//LoadRom("Super_mario_brothers2.nes");	
+	//LoadRom("Super Mario Bros. (World).nes");	
+	LoadRom("Castlevania (USA) (Rev A).nes");
+
 	return true;
 }
 
@@ -287,7 +291,7 @@ void CPU6502::CreateInstructionArray() {
 bool CPU6502::LoadRom(const std::string& name)
 {
 	std::cout << "Loading ROM " << name << "." << std::endl;
-	unsigned char opcode;	
+	uchar opcode;	
 	std::ifstream source(name.c_str(), std::ios_base::binary);
 	std::stringstream ss;
 
@@ -308,48 +312,50 @@ bool CPU6502::LoadRom(const std::string& name)
 	std::cout << "CHR_ROM size " + std::to_string(CHR_ROM_size) + "Kb." << std::endl;
 
 	//Flags		
-	F6 = { header[6] };
-	
+	F6 = { (uchar)header[6] };
 	std::cout << std::endl << "Flag6" << std::endl;
 	std::cout << "-----" << std::endl;
-	std::cout << "Mapper: " << std::to_string(F6.mapper) << std::endl;
-	std::cout << "Ignore mirroring: " << std::to_string(F6.ignoreMirroring) << std::endl;
-	std::cout << "Trainer: " << std::to_string(F6.trainer) << std::endl;
-	std::cout << "Battery-packed PRG RAM: " << std::to_string(F6.batteryPGR_RAM) << std::endl;
-	std::cout << "Mirroring: " << std::to_string(F6.mirroring) << std::endl;
+	std::cout << "Mapper: " << std::to_string(F6 >> 4) << std::endl;
+	std::cout << "Ignore mirroring: " << std::to_string(GET_BIT(3,F6)) << std::endl;
+	std::cout << "Trainer: " << std::to_string(GET_BIT(2, F6)) << std::endl;
+	std::cout << "Battery-packed PRG RAM: " << std::to_string(GET_BIT(1, F6)) << std::endl;
+	std::cout << "Mirroring: " << std::to_string(GET_BIT(0, F6)) << std::endl;
 	
-	F7 = { header[7] };
+	F7 = { (uchar)header[7] };
 	
 	std::cout << std::endl << "Flag7" << std::endl;
 	std::cout << "-----" << std::endl;
-	std::cout << "Mapper: " << std::to_string(F7.mapper) << std::endl;
-	if (F7.nes2_0 == 2)
+	std::cout << "Mapper: " << std::to_string(F7 >> 4) << std::endl;
+	if (GET_2BIT(2, F7) == 2)
 		std::cout << "Format: NES 2.0" << std::endl;
 	else
 		std::cout << "Format: iNES" << std::endl;
 
-	std::cout << "PlayChoice-10: " << std::to_string(F7.playChoice_10) << std::endl;	
-	std::cout << "VS Unisystem: " << std::to_string(F7.VS_Unisystem) << std::endl;
+	std::cout << "PlayChoice-10: " << std::to_string(GET_BIT(1, F7)) << std::endl;
+	std::cout << "VS Unisystem: " << std::to_string(GET_BIT(0, F7)) << std::endl;
 
-	F8 = { header[8] };
+	F8 = { (uchar)header[8] };
 
 	std::cout << std::endl << "Flag8" << std::endl;
 	std::cout << "-----" << std::endl;
-	std::cout << "PRG RAM size: " << std::to_string(F8.PRG_RAM_size) << std::endl;
+	std::cout << "PRG RAM size: " << std::to_string(F8) << std::endl;
 	
-	F9 = { header[9] };
+	F9 = { (uchar)header[9] };
 
-	F10 = { header[10] };
+	F10 = { (uchar)header[10] };
 
 	std::cout << std::endl << "Flag9" << std::endl;
 	std::cout << "-----" << std::endl;
-	if (F10.TV_system == 0)
+	if (GET_2BIT(0, F10) == 0)
 		std::cout << "TV system: NTSC"<< std::endl;
-	else if (F10.TV_system == 2)
+	else if (F10 << 6 >> 6 == 2)
 		std::cout << "TV system: PAL"<< std::endl;
 	else
 		std::cout << "TV system: Dual compatible"<< std::endl;
 			
+	mapper = (F7 >> 4) * 4 + (F6 >> 4);
+
+	std::cout << std::endl << "Mapper #" << std::to_string(mapper) << std::endl;
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	PRG_ROM.resize(PRG_ROM_size * 1024);
